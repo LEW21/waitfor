@@ -36,6 +36,7 @@ func main() {
 func pingTCP(hostport string, timeoutSeconds int) {
 	timeout := time.Duration(timeoutSeconds) * time.Second
 	start := time.Now()
+	nextTry := time.Now()
 
 	for {
 		_, err := net.DialTimeout("tcp", hostport, time.Second)
@@ -50,6 +51,7 @@ func pingTCP(hostport string, timeoutSeconds int) {
 			panic(err)
 		}
 
-		time.Sleep(200 * time.Millisecond)
+		nextTry = nextTry.Add(time.Second)
+		time.Sleep(nextTry.Sub(time.Now()))
 	}
 }

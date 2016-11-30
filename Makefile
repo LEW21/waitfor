@@ -7,4 +7,8 @@ binary:
 	GOPATH=$(GOPATH) CGO_ENABLED=0 go build
 
 container:
-	docker build -t lew21/waitfor .
+	docker build -t waitfor .
+
+commit: binary
+	git add .
+	git commit
