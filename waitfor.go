@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"net"
+	"net/url"
 	"sync"
+	"strings"
 	"time"
 	goopt "github.com/droundy/goopt"
 )
@@ -15,7 +17,7 @@ func main() {
 		return "Wait for endpoints to become available."
 	}
 	goopt.Version = "1.0"
-	goopt.Summary = "waitforit [-t N] host:port [host:port [...]]"
+	goopt.Summary = "waitforit [-t N] URL-or-host:port [URL-or-host:port [...]]"
 	goopt.Parse(nil)
 
 	fmt.Printf("Waiting for %d seconds.\n", *timeout)
@@ -24,6 +26,15 @@ func main() {
 
 	for _, hostport := range goopt.Args {
 		wg.Add(1)
+
+		if strings.Contains(hostport, "/") {
+			u, err := url.Parse(hostport)
+			if err != nil {
+				panic(err)
+			}
+			hostport = u.Host
+		}
+
 		go func(){
 			defer wg.Done()
 			pingTCP(hostport, *timeout)
